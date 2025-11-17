@@ -225,7 +225,7 @@ class DynaTTAAdapter(nn.Module):
         print(f'Number of adaptations: {self.n_adapt}')
         print(f'Test MSE: {self.mse_all.mean():.4f}, Test MAE: {self.mae_all.mean():.4f}')
         self.model.eval()
-        self.plot_lr_history()
+        # self.plot_lr_history()
         return self.mse_all.mean(), self.mae_all.mean()
 
     # ------------------ Core enhancements ------------------
@@ -577,6 +577,13 @@ class DynaTTAAdapter(nn.Module):
 
         ax.grid(True, color='white')
         fig.tight_layout()
+
+        from pathlib import Path
+        # 创建 plots 文件夹
+        plots_path = Path("plots")
+        plots_path.mkdir(exist_ok=True)
+
+        print(f"已创建文件夹: {plots_path}")
         plt.savefig(f"plots/plot_lr_history_DYNATTA_{self.cfg.MODEL.NAME}_{self.cfg.DATA.NAME}_{self.cfg.DATA.PRED_LEN}_warmup{self.cfg.TTA.DYNATTA.WARMUP_FACTOR}_buffer_update_step_{self.cfg.TTA.DYNATTA.UPDATE_BUFFERS_INTERVAL}.pdf",bbox_inches='tight', pad_inches=0.0)
         plt.savefig(f"plots/plot_lr_history_DYNATTA_{self.cfg.MODEL.NAME}_{self.cfg.DATA.NAME}_{self.cfg.DATA.PRED_LEN}_warmup{self.cfg.TTA.DYNATTA.WARMUP_FACTOR}_buffer_update_step_{self.cfg.TTA.DYNATTA.UPDATE_BUFFERS_INTERVAL}.png",bbox_inches='tight', pad_inches=0.0)
 
