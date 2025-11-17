@@ -12,19 +12,16 @@
 # _C.VISIBLE_DEVICES = 5
 # _C.device = 'cuda:5'
 
-echo $CUDA_VISIBLE_DEVICES
-
 GATING_INIT=0.01
 LOSS_ALPHA=0.1
 LOW_RANK=16
 TTA=PETSA
-echo $CUDA_VISIBLE_DEVICES
 
 
 ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
-DATASET="ETTm1"
-datafold="ETT-small"
-datapath="ETTm1.csv"
+DATASET="Traffic"
+datafold="traffic"
+datapath="traffic.csv"
 PRED_LEN=96
 MODEL="Timer-LOTSA"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
@@ -62,8 +59,8 @@ printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 4 \
-    device 'cuda:4' \
+    VISIBLE_DEVICES 5 \
+    device 'cuda:5' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
@@ -79,5 +76,5 @@ python main.py DATA.NAME ${DATASET} \
     TTA.PETSA.GATING_INIT 0.3 \
     TTA.PETSA.RANK ${LOW_RANK} \
     TTA.PETSA.LOSS_ALPHA ${LOSS_ALPHA} \
-    RESULT_DIR ${RESULT_DIR}
+    RESULT_DIR ${RESULT_DIR} >> ${OUTPUT}
 done

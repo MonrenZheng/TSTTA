@@ -21,17 +21,16 @@
 
 echo $CUDA_VISIBLE_DEVICES
 
-ckpt_path="/data/qiuyunzhong/CKPT/Building_timegpt_d1024_l8_p96_n64_new_full.ckpt"
-MODEL="Timer-UTSD"
+ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
 TTA=DynaTTA
-DATASET="Electricity"
-datafold="electricity"
-datapath="electricity.csv"
+DATASET="ETTm1"
+datafold="ETT-small"
+datapath="ETTm1.csv"
 PRED_LEN=96
+MODEL="Timer-1"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
 GATING_INIT=0.01
-BASE_LR=0.001
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"
@@ -54,15 +53,13 @@ echo "GATING_INIT          : $GATING_INIT"
 echo "====================================\n\n"
 } >> "${OUTPUT}"
 # -----------------------------------
-
-
-for PRED_LEN in 24 48 96 192; do
+for PRED_LEN in 24 48 96 192 336 720; do
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 5 \
-    device 'cuda:5' \
+    VISIBLE_DEVICES 3 \
+    device 'cuda:3' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
@@ -72,7 +69,6 @@ python main.py DATA.NAME ${DATASET} \
     TRAIN.ENABLE False \
     TRAIN.CHECKPOINT_DIR ${CHECKPOINT_DIR} \
     TTA.ENABLE True \
-    TTA.SOLVER.BASE_LR ${BASE_LR} \
     TTA.TAFAS.GATING_INIT ${GATING_INIT} \
     RESULT_DIR ${RESULT_DIR} >> ${OUTPUT}
 done

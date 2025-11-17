@@ -4,9 +4,9 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-#!/bin/bash
-#SBATCH --gres=gpu:1
-#SBATCH --mem=30G
+# !/bin/bash
+# SBATCH --gres=gpu:1
+# SBATCH --mem=30G
 
 
 # _C.VISIBLE_DEVICES = 5
@@ -19,11 +19,11 @@ TTA=PETSA
 
 
 ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
-DATASET="ETTm2"
-datafold="ETT-small"
-datapath="ETTm2.csv"
+DATASET="Exchange"
+datafold="exchange_rate"
+datapath="exchange_rate.csv"
 PRED_LEN=96
-MODEL="Timer-LOTSA"
+MODEL="Timer-1"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
 BASE_LR=0.001
@@ -59,8 +59,8 @@ printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 7 \
-    device 'cuda:7' \
+    VISIBLE_DEVICES 4 \
+    device 'cuda:4' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
@@ -76,5 +76,5 @@ python main.py DATA.NAME ${DATASET} \
     TTA.PETSA.GATING_INIT 0.3 \
     TTA.PETSA.RANK ${LOW_RANK} \
     TTA.PETSA.LOSS_ALPHA ${LOSS_ALPHA} \
-    RESULT_DIR ${RESULT_DIR}
+    RESULT_DIR ${RESULT_DIR} >> ${OUTPUT}
 done

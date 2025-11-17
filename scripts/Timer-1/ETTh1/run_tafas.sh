@@ -22,14 +22,16 @@
 echo $CUDA_VISIBLE_DEVICES
 
 ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
-TTA=DynaTTA
-DATASET="Traffic"
-datafold="traffic"
-datapath="traffic.csv"
+TTA=TAFAS
+DATASET="ETTh1"
+datafold="ETT-small"
+datapath="ETTh1.csv"
 PRED_LEN=96
-MODEL="Timer-LOTSA"
+MODEL="Timer-1"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
+BASE_LR=0.001
+WEIGHT_DECAY=0.0001
 GATING_INIT=0.01
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
@@ -46,22 +48,28 @@ echo "datafold             : $datafold"
 echo "datapath             : $datapath"
 echo "PRED_LEN             : $PRED_LEN"
 echo "MODEL                : $MODEL"
-echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 echo "RESULT_DIR           : $RESULT_DIR"
 echo "OUTPUT               : $OUTPUT"
+echo "BASE_LR              : $BASE_LR"
+echo "WEIGHT_DECAY         : $WEIGHT_DECAY"
 echo "GATING_INIT          : $GATING_INIT"
-echo "====================================\n\n"
+echo "===================================="
 } >> "${OUTPUT}"
 # -----------------------------------
 
 
 for PRED_LEN in 24 48 96 192 336 720; do
+# for GATING_INIT in 0.01 0.05 0.1 0.3; do #0.01,0.05,0.1,and0.3
+# for BASE_LR in 0.005 0.003 0.001 0.0005 0.0001; do
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
+# printf '========== GATING_INIT: %s ==========\n' "${GATING_INIT}" >> "${OUTPUT}" 2>&1
+# printf '========== BASE_LR: %s ==========\n' "${BASE_LR}" >> "${OUTPUT}" 2>&1
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 5 \
-    device 'cuda:5' \
+    SEED 1 \
+    VISIBLE_DEVICES 6 \
+    device 'cuda:6' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
@@ -71,6 +79,10 @@ python main.py DATA.NAME ${DATASET} \
     TRAIN.ENABLE False \
     TRAIN.CHECKPOINT_DIR ${CHECKPOINT_DIR} \
     TTA.ENABLE True \
+    TTA.SOLVER.BASE_LR ${BASE_LR} \
+    TTA.SOLVER.WEIGHT_DECAY ${WEIGHT_DECAY} \
     TTA.TAFAS.GATING_INIT ${GATING_INIT} \
     RESULT_DIR ${RESULT_DIR} >> ${OUTPUT}
 done
+# done
+# done

@@ -21,17 +21,18 @@
 
 echo $CUDA_VISIBLE_DEVICES
 
-ckpt_path="/data/qiuyunzhong/CKPT/Building_timegpt_d1024_l8_p96_n64_new_full.ckpt"
-MODEL="Timer-UTSD"
-TTA=DynaTTA
-DATASET="Electricity"
-datafold="electricity"
-datapath="electricity.csv"
+ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
+TTA=TAFAS
+DATASET="ETTm2"
+datafold="ETT-small"
+datapath="ETTm2.csv"
 PRED_LEN=96
+MODEL="Timer-1"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
-GATING_INIT=0.01
 BASE_LR=0.001
+WEIGHT_DECAY=0.0001
+GATING_INIT=0.01
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"
@@ -47,22 +48,23 @@ echo "datafold             : $datafold"
 echo "datapath             : $datapath"
 echo "PRED_LEN             : $PRED_LEN"
 echo "MODEL                : $MODEL"
-echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 echo "RESULT_DIR           : $RESULT_DIR"
 echo "OUTPUT               : $OUTPUT"
+echo "BASE_LR              : $BASE_LR"
+echo "WEIGHT_DECAY         : $WEIGHT_DECAY"
 echo "GATING_INIT          : $GATING_INIT"
-echo "====================================\n\n"
+echo "===================================="
 } >> "${OUTPUT}"
 # -----------------------------------
 
 
-for PRED_LEN in 24 48 96 192; do
+for PRED_LEN in 24 48 96 192 336 720; do # 
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 5 \
-    device 'cuda:5' \
+    VISIBLE_DEVICES 1 \
+    device 'cuda:1' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
@@ -73,6 +75,7 @@ python main.py DATA.NAME ${DATASET} \
     TRAIN.CHECKPOINT_DIR ${CHECKPOINT_DIR} \
     TTA.ENABLE True \
     TTA.SOLVER.BASE_LR ${BASE_LR} \
+    TTA.SOLVER.WEIGHT_DECAY ${WEIGHT_DECAY} \
     TTA.TAFAS.GATING_INIT ${GATING_INIT} \
     RESULT_DIR ${RESULT_DIR} >> ${OUTPUT}
 done

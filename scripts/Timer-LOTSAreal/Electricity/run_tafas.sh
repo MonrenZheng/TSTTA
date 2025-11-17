@@ -21,11 +21,11 @@
 
 echo $CUDA_VISIBLE_DEVICES
 
-ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
+ckpt_path="/data/qiuyunzhong/CKPT/Large_timegpt_d1024_l8_p96_n64_new_full.ckpt"
 TTA=TAFAS
-DATASET="Traffic"
-datafold="traffic"
-datapath="traffic.csv"
+DATASET="Electricity"
+datafold="electricity"
+datapath="electricity.csv"
 PRED_LEN=96
 MODEL="Timer-LOTSA"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
@@ -63,8 +63,8 @@ printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 7 \
-    device 'cuda:7' \
+    VISIBLE_DEVICES 2 \
+    device 'cuda:2' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
