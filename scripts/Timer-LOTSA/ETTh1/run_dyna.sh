@@ -66,8 +66,8 @@ CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RTAB_SIZE=$((2 * PRED_LEN))
 python main.py DATA.NAME ${DATASET} \
     SEED 1 \
-    VISIBLE_DEVICES 7 \
-    device 'cuda:7' \
+    VISIBLE_DEVICES 4 \
+    device 'cuda:4' \
     DATA.PRED_LEN ${PRED_LEN} \
     TTA.DYNATTA.RTAB_SIZE ${RTAB_SIZE} \
     DATA.fold ${datafold} \

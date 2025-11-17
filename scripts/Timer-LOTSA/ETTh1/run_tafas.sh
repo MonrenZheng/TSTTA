@@ -34,7 +34,7 @@ BASE_LR=0.001
 WEIGHT_DECAY=0.0001
 GATING_INIT=0.01
 
-OUTPUT_DIR="logs-wd0.0001/${TTA}/${MODEL}/${DATASET}"
+OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"
 
 OUTPUT="${OUTPUT_DIR}/res.txt"
@@ -68,8 +68,8 @@ CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
     SEED 1 \
-    VISIBLE_DEVICES 3 \
-    device 'cuda:3' \
+    VISIBLE_DEVICES 6 \
+    device 'cuda:6' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \
