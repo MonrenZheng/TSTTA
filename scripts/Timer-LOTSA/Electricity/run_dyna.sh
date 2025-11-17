@@ -30,7 +30,7 @@ PRED_LEN=96
 MODEL="Timer-LOTSA"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
-GATING_INIT=0.05
+GATING_INIT=0.01
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"
@@ -55,7 +55,7 @@ echo "====================================\n\n"
 # -----------------------------------
 
 
-for PRED_LEN in 24 48 96 192; do # 24 48 96 
+for PRED_LEN in 24 48 96 192 336 720; do # 24 48 96 
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"

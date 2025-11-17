@@ -14,7 +14,7 @@
 
 echo $CUDA_VISIBLE_DEVICES
 
-GATING_INIT=0.05
+GATING_INIT=0.01
 LOSS_ALPHA=0.1
 LOW_RANK=16
 TTA=PETSA
@@ -30,7 +30,7 @@ MODEL="Timer-LOTSA"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
 BASE_LR=0.001
-WEIGHT_DECAY=0.0
+WEIGHT_DECAY=0.0001
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"
@@ -57,7 +57,7 @@ echo "===================================="
 } >> "${OUTPUT}"
 # -----------------------------------
 
-for PRED_LEN in 192; do
+for PRED_LEN in 24 48 96 192 336 720; do
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
