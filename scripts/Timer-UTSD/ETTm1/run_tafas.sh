@@ -21,7 +21,7 @@
 
 echo $CUDA_VISIBLE_DEVICES
 
-ckpt_path="/data/qiuyunzhong/ts_adaptive_inference/Timer/ckpt/Building_timegpt_d1024_l8_p96_n64_new_full.ckpt"
+ckpt_path="/data/qiuyunzhong/CKPT/Building_timegpt_d1024_l8_p96_n64_new_full.ckpt"
 MODEL="Timer-UTSD"
 TTA=TAFAS
 DATASET="ETTm1"
@@ -31,8 +31,8 @@ PRED_LEN=96
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
 BASE_LR=0.001
-WEIGHT_DECAY=0.0
-GATING_INIT=0.05
+WEIGHT_DECAY=0.0001
+GATING_INIT=0.01
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"

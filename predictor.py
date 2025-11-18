@@ -78,14 +78,14 @@ class Predictor:
         mae_all = []
         
         for inputs in tqdm(dataloader, desc='Calculating Errors'):
-            enc_window_raw, dec_window = prepare_inputs(inputs)
-            if self.norm_method == 'SAN':
-                enc_window, statistics_pred = self.norm_module.normalize(enc_window_raw)
-            else:  # Normalization from Non-stationary Transformer
-                means = enc_window_raw.mean(1, keepdim=True).detach()
-                enc_window = enc_window_raw - means
-                stdev = torch.sqrt(torch.var(enc_window, dim=1, keepdim=True, unbiased=False) + 1e-5)
-                enc_window /= stdev
+            enc_window, dec_window = prepare_inputs(inputs)
+            # if self.norm_method == 'SAN':
+            #     enc_window, statistics_pred = self.norm_module.normalize(enc_window_raw)
+            # else:  # Normalization from Non-stationary Transformer
+            #     means = enc_window_raw.mean(1, keepdim=True).detach()
+            #     enc_window = enc_window_raw - means
+            #     stdev = torch.sqrt(torch.var(enc_window, dim=1, keepdim=True, unbiased=False) + 1e-5)
+            #     enc_window /= stdev
             
             ground_truth = dec_window[:, -self.cfg.DATA.PRED_LEN:, self.cfg.DATA.TARGET_START_IDX:].float()
             # dec_zeros = torch.zeros_like(dec_window[:, -self.cfg.DATA.PRED_LEN:, :]).float()
@@ -124,11 +124,11 @@ class Predictor:
 
             pred = pred_total[:, -self.cfg.DATA.PRED_LEN:, self.cfg.DATA.TARGET_START_IDX:]
             
-            if self.norm_method == 'SAN':
-                pred = self.norm_module.de_normalize(pred, statistics_pred)
-            else:  # De-Normalization from Non-stationary Transformer
-                pred = pred * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.cfg.DATA.PRED_LEN, 1))
-                pred = pred + (means[:, 0, :].unsqueeze(1).repeat(1, self.cfg.DATA.PRED_LEN, 1))
+            # if self.norm_method == 'SAN':
+            #     pred = self.norm_module.de_normalize(pred, statistics_pred)
+            # else:  # De-Normalization from Non-stationary Transformer
+            #     pred = pred * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.cfg.DATA.PRED_LEN, 1))
+            #     pred = pred + (means[:, 0, :].unsqueeze(1).repeat(1, self.cfg.DATA.PRED_LEN, 1))
             
             mse = F.mse_loss(pred, ground_truth, reduction='none').mean(dim=(-2, -1))
             mae = F.l1_loss(pred, ground_truth, reduction='none').mean(dim=(-2, -1))

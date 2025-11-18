@@ -21,7 +21,7 @@
 
 echo $CUDA_VISIBLE_DEVICES
 
-ckpt_path="/data/qiuyunzhong/CKPT/Timer_forecast_1.0.ckpt"
+ckpt_path="/data/qiuyunzhong/CKPT/Large_timegpt_d1024_l8_p96_n64_new_full.ckpt"
 TTA=DynaTTA
 DATASET="ETTh1"
 datafold="ETT-small"
@@ -55,7 +55,7 @@ echo "====================================\n\n"
 } >> "${OUTPUT}"
 # -----------------------------------
 
-for PRED_LEN in 24 48 96 192 336 720; do
+for PRED_LEN in 24 48 96 192; do
 # for GATING_INIT in 0.01 0.05 0.1 0.3; do #0.01,0.05,0.1,and0.3
 # for BASE_LR in 0.005 0.003 0.001 0.0005 0.0001; do
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
@@ -65,9 +65,8 @@ echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RTAB_SIZE=$((2 * PRED_LEN))
 python main.py DATA.NAME ${DATASET} \
-    SEED 1 \
-    VISIBLE_DEVICES 7 \
-    device 'cuda:7' \
+    VISIBLE_DEVICES 1 \
+    device 'cuda:1' \
     DATA.PRED_LEN ${PRED_LEN} \
     TTA.DYNATTA.RTAB_SIZE ${RTAB_SIZE} \
     DATA.fold ${datafold} \

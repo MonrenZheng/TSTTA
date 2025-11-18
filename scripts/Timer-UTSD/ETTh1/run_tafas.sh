@@ -32,7 +32,7 @@ CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 RESULT_DIR="./results/${TTA}/"
 BASE_LR=0.001
 WEIGHT_DECAY=0.0001
-GATING_INIT=0.05
+GATING_INIT=0.01
 
 OUTPUT_DIR="logs/${TTA}/${MODEL}/${DATASET}"
 mkdir -p "${OUTPUT_DIR}"
@@ -58,13 +58,13 @@ echo "===================================="
 # -----------------------------------
 
 
-for PRED_LEN in 24 48 96 192 336 720; do
+for PRED_LEN in 24 48 96 192; do
 printf '\n\n========== PRED_LEN: %s ==========\n' "${PRED_LEN}" >> "${OUTPUT}" 2>&1
 CHECKPOINT_DIR="./checkpoints/${MODEL}/${DATASET}_${PRED_LEN}/"
 echo "CHECKPOINT_DIR       : $CHECKPOINT_DIR"
 python main.py DATA.NAME ${DATASET} \
-    VISIBLE_DEVICES 5 \
-    device 'cuda:5' \
+    VISIBLE_DEVICES 7 \
+    device 'cuda:7' \
     DATA.PRED_LEN ${PRED_LEN} \
     DATA.fold ${datafold} \
     DATA.path ${datapath} \

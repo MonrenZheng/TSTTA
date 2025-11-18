@@ -107,11 +107,11 @@ class Model(nn.Module):
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         B, L, M = x_enc.shape
 
-        # # Normalization from Non-stationary Transformer
-        # means = x_enc.mean(1, keepdim=True).detach()
-        # x_enc = x_enc - means
-        # stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
-        # x_enc /= stdev
+        # Normalization from Non-stationary Transformer
+        means = x_enc.mean(1, keepdim=True).detach()
+        x_enc = x_enc - means
+        stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
+        x_enc /= stdev
 
         # do patching and embedding
         x_enc = x_enc.permute(0, 2, 1)  # [B, M, T]
@@ -122,8 +122,8 @@ class Model(nn.Module):
         dec_out = self.proj(dec_out)  # [B * M, N, L]
         dec_out = dec_out.reshape(B, M, -1).transpose(1, 2)  # [B, T, M]
 
-        # # De-Normalization from Non-stationary Transformer
-        # dec_out = dec_out * stdev + means
+        # De-Normalization from Non-stationary Transformer
+        dec_out = dec_out * stdev + means
         if self.output_attention:
             return dec_out, attns
         return dec_out

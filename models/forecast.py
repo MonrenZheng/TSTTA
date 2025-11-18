@@ -25,18 +25,18 @@ def forecast(
     ) -> Tuple[torch.Tensor, torch.Tensor]:
     enc_window, dec_window = prepare_inputs(inputs)
     norm_method = get_norm_method(cfg)
-    if norm_method == 'SAN':
-        enc_window, statistics = norm_module.normalize(enc_window)
-    elif norm_method == 'RevIN':
-        enc_window = norm_module(enc_window, 'norm')
-    elif norm_method == 'DishTS':
-        enc_window, _ = norm_module(enc_window, 'forward')
-    else:  # Normalization from Non-stationary Transformer
-        means = enc_window.mean(1, keepdim=True).detach()
-        enc_window = enc_window - means
-        # stdev = torch.sqrt(torch.var(enc_window, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        stdev = torch.sqrt(torch.var(enc_window, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
-        enc_window /= stdev
+    # if norm_method == 'SAN':
+    #     enc_window, statistics = norm_module.normalize(enc_window)
+    # elif norm_method == 'RevIN':
+    #     enc_window = norm_module(enc_window, 'norm')
+    # elif norm_method == 'DishTS':
+    #     enc_window, _ = norm_module(enc_window, 'forward')
+    # else:  # Normalization from Non-stationary Transformer
+    #     means = enc_window.mean(1, keepdim=True).detach()
+    #     enc_window = enc_window - means
+    #     # stdev = torch.sqrt(torch.var(enc_window, dim=1, keepdim=True, unbiased=False) + 1e-5)
+    #     stdev = torch.sqrt(torch.var(enc_window, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
+    #     enc_window /= stdev
     
     ground_truth = dec_window[:, -cfg.DATA.PRED_LEN:, cfg.DATA.TARGET_START_IDX:].float()
     
@@ -58,6 +58,7 @@ def forecast(
     seq = torch.tensor(enc_window, dtype=dtype).cuda()
     assert seq.shape[1] % patch_len == 0, f'seq_len {seq.shape[1]} is not a multiple of patch_len {patch_len}'
 
+    model.eval()
     # gpu autocast
     # none->float16->float32
     # 32->36->53
@@ -73,14 +74,14 @@ def forecast(
 
     pred = pred_total[:, -cfg.DATA.PRED_LEN:, cfg.DATA.TARGET_START_IDX:]
     
-    if norm_method == 'SAN':
-        pred = norm_module.de_normalize(pred, statistics)
-    elif norm_method == 'RevIN':
-        pred = norm_module(pred, 'denorm')
-    elif norm_method == 'DishTS':
-        pred = norm_module(pred, 'inverse')
-    else:  # De-Normalization from Non-stationary Transformer
-        pred = pred * (stdev[:, 0, :].unsqueeze(1).repeat(1, cfg.DATA.PRED_LEN, 1))
-        pred = pred + (means[:, 0, :].unsqueeze(1).repeat(1, cfg.DATA.PRED_LEN, 1))
+    # if norm_method == 'SAN':
+    #     pred = norm_module.de_normalize(pred, statistics)
+    # elif norm_method == 'RevIN':
+    #     pred = norm_module(pred, 'denorm')
+    # elif norm_method == 'DishTS':
+    #     pred = norm_module(pred, 'inverse')
+    # else:  # De-Normalization from Non-stationary Transformer
+    #     pred = pred * (stdev[:, 0, :].unsqueeze(1).repeat(1, cfg.DATA.PRED_LEN, 1))
+    #     pred = pred + (means[:, 0, :].unsqueeze(1).repeat(1, cfg.DATA.PRED_LEN, 1))
     
     return pred, ground_truth

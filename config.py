@@ -21,7 +21,7 @@ from yacs.config import CfgNode as CN
 
 _C = CN()
 # random seed number
-_C.SEED = 0
+_C.SEED = 1
 # number of gpus per node
 _C.NUM_GPUS = 8 
 _C.VISIBLE_DEVICES = 7
@@ -40,7 +40,7 @@ _C.DATA.fold = 'ETT-small'
 _C.DATA.path = 'ETTh1.csv'
 _C.DATA.NAME = 'weather'
 _C.DATA.N_VAR = 21
-_C.DATA.SEQ_LEN = 96
+_C.DATA.SEQ_LEN = 672
 _C.DATA.LABEL_LEN = 48
 _C.DATA.PRED_LEN = 96
 _C.DATA.FEATURES = 'M'
